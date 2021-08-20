@@ -28,47 +28,43 @@ function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
 
-function removeLiFromOl(dom) {
-  return dom.addEventListener('click', function() {
-    dom.parentNode.removeChild(dom);
-  });
-}
-
 function cartItemClickListener(event) {
-  const ol = document.querySelector('.cart__items');
-  const id = getSkuFromProductItem(event.parentNode);
-  fetch(`https://api.mercadolibre.com/items/${id}`)
-    .then((r) => r.json())
-    .then((r) => createCartItemElement(r))
-    .then((r) => {
-      ol.appendChild(r);
-      return r;
-    })
-    .then((r) => removeLiFromOl(r));
+  return event.parentNode.removeChild(event);
 }
 
 function createCartItemElement({ id, title, price }) {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
-  li.addEventListener('click', cartItemClickListener);
+  li.addEventListener('click', function () {
+    cartItemClickListener(li);
+  });
   return li;
+}
+
+function addLiInShoppingCart(element) {
+  const ol = document.querySelector('.cart__items');
+  const id = getSkuFromProductItem(element.parentNode);
+  fetch(`https://api.mercadolibre.com/items/${id}`)
+    .then((r) => r.json())
+    .then((r) => createCartItemElement(r))
+    .then((r) => ol.appendChild(r));
 }
 
 async function addCarShoppingThing() {
   const button = document.querySelectorAll('.item__add');
-  button.forEach((element) => element.addEventListener('click', function() {
-    cartItemClickListener(element);
-  }))
+  button.forEach((element) => element.addEventListener('click', function () {
+    addLiInShoppingCart(element);
+  }));
 }
 
 async function tentandoFazerAParada() {
   const section = document.querySelector('.items');
-  fetch("https://api.mercadolibre.com/sites/MLB/search?q=computador")
+  fetch('https://api.mercadolibre.com/sites/MLB/search?q=computador')
     .then((r) => r.json())
     .then((r) => r.results)
     .then((r) => r.forEach((element) => section.appendChild(createProductItemElement(element))))
-    .then((r) => addCarShoppingThing());
+    .then((_) => addCarShoppingThing());
 }
 
 window.onload = () => {
