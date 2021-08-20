@@ -28,16 +28,38 @@ function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
 
-function cartItemClickListener(event) {
-  // coloque seu código aqui
+function removeLiFromOl(dom) {
+  return dom.addEventListener('click', function() {
+    dom.parentNode.removeChild(dom);
+  });
 }
 
-function createCartItemElement({ sku, name, salePrice }) {
+function cartItemClickListener(event) {
+  const ol = document.querySelector('.cart__items');
+  const id = getSkuFromProductItem(event.parentNode);
+  fetch(`https://api.mercadolibre.com/items/${id}`)
+    .then((r) => r.json())
+    .then((r) => createCartItemElement(r))
+    .then((r) => {
+      ol.appendChild(r);
+      return r;
+    })
+    .then((r) => removeLiFromOl(r));
+}
+
+function createCartItemElement({ id, title, price }) {
   const li = document.createElement('li');
   li.className = 'cart__item';
-  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.innerText = `SKU: ${id} | NAME: ${title} | PRICE: $${price}`;
   li.addEventListener('click', cartItemClickListener);
   return li;
+}
+
+async function addCarShoppingThing() {
+  const button = document.querySelectorAll('.item__add');
+  button.forEach((element) => element.addEventListener('click', function() {
+    cartItemClickListener(element);
+  }))
 }
 
 async function tentandoFazerAParada() {
@@ -45,9 +67,10 @@ async function tentandoFazerAParada() {
   fetch("https://api.mercadolibre.com/sites/MLB/search?q=computador")
     .then((r) => r.json())
     .then((r) => r.results)
-    .then((r) => r.map((element) => section.appendChild(createProductItemElement(element))));
+    .then((r) => r.forEach((element) => section.appendChild(createProductItemElement(element))))
+    .then((r) => addCarShoppingThing());
 }
 
-window.onload = () => { 
- tentandoFazerAParada();
+window.onload = () => {
+  tentandoFazerAParada();
 };
