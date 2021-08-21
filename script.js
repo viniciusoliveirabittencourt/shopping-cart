@@ -28,6 +28,14 @@ function getSkuFromProductItem(item) {
   return item.querySelector('span.item__sku').innerText;
 }
 
+async function calcPrice() {
+  const span = document.querySelector('.total-price');
+  const price = JSON.parse(localStorage.getItem('carItem'));
+  console.log(price);
+  const priceRedu = price.reduce((number, index) => number + index.price, 0);
+  span.innerText = priceRedu.toFixed(2);
+}
+
 function cartItemClickListener(event) {
   const split = event.innerText.split(' ');
   const arrStorage = JSON.parse(localStorage.getItem('carItem'));
@@ -61,14 +69,6 @@ function addLocalStorage(obj) {
   arrLstorage.push({ id: obj.id, title: obj.title, price: obj.price });
   localStorage.setItem('carItem', JSON.stringify(arrLstorage));
   return { id: obj.id, title: obj.title, price: obj.price };
-}
-
-async function calcPrice() {
-  const span = document.querySelector('.total-price');
-  const price = JSON.parse(localStorage.getItem('carItem'));
-  console.log(price);
-  const priceRedu = price.reduce((number, index) => number + index.price, 0);
-  span.innerText = priceRedu.toFixed(2);
 }
 
 function addLiInShoppingCart(element) {
