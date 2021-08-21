@@ -34,6 +34,7 @@ function cartItemClickListener(event) {
   const indexOF = arrStorage.indexOf(arrStorage.find((element) => element.id === split[1]));
   arrStorage.splice(indexOF, 1);
   localStorage.setItem('carItem', JSON.stringify(arrStorage));
+  calcPrice();
   return event.parentNode.removeChild(event);
 }
 
@@ -59,7 +60,15 @@ function addLocalStorage(obj) {
   }
   arrLstorage.push({ id: obj.id, title: obj.title, price: obj.price });
   localStorage.setItem('carItem', JSON.stringify(arrLstorage));
-  return {id: obj.id, title: obj.title, price: obj.price};
+  return { id: obj.id, title: obj.title, price: obj.price };
+}
+
+async function calcPrice() {
+  const span = document.querySelector('.total-price');
+  const price = JSON.parse(localStorage.getItem('carItem'));
+  console.log(price);
+  const priceRedu = price.reduce((number, index) => number + index.price, 0);
+  span.innerText = priceRedu.toFixed(2);
 }
 
 function addLiInShoppingCart(element) {
@@ -71,7 +80,10 @@ function addLiInShoppingCart(element) {
       addLocalStorage(r);
       return createCartItemElement(r);
     })
-    .then((r) => ol.appendChild(r));
+    .then((r) => {
+      ol.appendChild(r);
+      calcPrice();
+    });
 }
 
 async function addCarShoppingThing() {
@@ -93,4 +105,5 @@ async function tentandoFazerAParada() {
 window.onload = () => {
   tentandoFazerAParada();
   addLocalStorage();
+  calcPrice();
 };
