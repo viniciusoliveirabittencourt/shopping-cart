@@ -56,17 +56,19 @@ function createCartItemElement({ id, title, price }) {
 }
 
 function addLocalStorage(obj) {
-  const arrLstorage = JSON.parse(localStorage.getItem('carItem') || '[]');
+  const carItem = 'carItem';
+  const arrLstorage = JSON.parse(localStorage.getItem(carItem) || '[]');
   if (obj === undefined) {
-    const ol = document.querySelector('.cart__items');
+    const ol = document.querySelector(`.${carItem}`);
     arrLstorage.forEach((element) => {
+      const ol = document.querySelector('.cart__items');
       const li = createCartItemElement(element);
       ol.appendChild(li);
     });
     return ol;
   }
   arrLstorage.push({ id: obj.id, title: obj.title, price: obj.price });
-  localStorage.setItem('carItem', JSON.stringify(arrLstorage));
+  localStorage.setItem(carItem, JSON.stringify(arrLstorage));
   return { id: obj.id, title: obj.title, price: obj.price };
 }
 
@@ -101,8 +103,20 @@ async function tentandoFazerAParada() {
     .then((_) => addCarShoppingThing());
 }
 
+function deleteListComplet() {
+  const ol = document.querySelector('.cart__items');
+  const buton = document.querySelector('.empty-cart');
+  const span = document.querySelector('.total-price');
+  buton.addEventListener('click', function () {
+    ol.innerHTML = '';
+    localStorage.removeItem('carItem');
+    span.innerText = 0;
+  });
+}
+
 window.onload = () => {
   tentandoFazerAParada();
   addLocalStorage();
   calcPrice();
+  deleteListComplet();
 };
