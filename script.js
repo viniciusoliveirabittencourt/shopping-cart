@@ -31,9 +31,8 @@ function getSkuFromProductItem(item) {
 async function calcPrice() {
   const span = document.querySelector('.total-price');
   const price = JSON.parse(localStorage.getItem('carItem'));
-  console.log(price);
   const priceRedu = price.reduce((number, index) => number + index.price, 0);
-  span.innerText = priceRedu.toFixed(2);
+  span.innerText = priceRedu.toString();
 }
 
 function cartItemClickListener(event) {
