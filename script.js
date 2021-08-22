@@ -1,3 +1,8 @@
+function removeLoading() {
+  const loading = document.querySelector('.loading');
+  loading.parentElement.removeChild(loading);
+}
+
 function createProductImageElement(imageSource) {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -31,8 +36,13 @@ function getSkuFromProductItem(item) {
 async function calcPrice() {
   const span = document.querySelector('.total-price');
   const price = JSON.parse(localStorage.getItem('carItem'));
-  const priceRedu = price.reduce((number, index) => number + index.price, 0);
-  span.innerText = priceRedu.toString();
+
+  if (price === null) {
+    span.innerText = 0;
+  } else {
+    const priceRedu = price.reduce((number, index) => number + index.price, 0);
+    span.innerText = priceRedu.toString();
+  }
 }
 
 function cartItemClickListener(event) {
@@ -59,9 +69,9 @@ function addLocalStorage(obj) {
   const carItem = 'carItem';
   const arrLstorage = JSON.parse(localStorage.getItem(carItem) || '[]');
   if (obj === undefined) {
-    const ol = document.querySelector(`.${carItem}`);
+    const cartItem = 'cart__items';
+    const ol = document.querySelector(`.${cartItem}`);
     arrLstorage.forEach((element) => {
-      const ol = document.querySelector('.cart__items');
       const li = createCartItemElement(element);
       ol.appendChild(li);
     });
@@ -72,7 +82,7 @@ function addLocalStorage(obj) {
   return { id: obj.id, title: obj.title, price: obj.price };
 }
 
-function addLiInShoppingCart(element) {
+async function addLiInShoppingCart(element) {
   const ol = document.querySelector('.cart__items');
   const id = getSkuFromProductItem(element.parentNode);
   fetch(`https://api.mercadolibre.com/items/${id}`)
@@ -100,7 +110,10 @@ async function tentandoFazerAParada() {
     .then((r) => r.json())
     .then((r) => r.results)
     .then((r) => r.forEach((element) => section.appendChild(createProductItemElement(element))))
-    .then((_) => addCarShoppingThing());
+    .then((_) => {
+      addCarShoppingThing();
+      removeLoading();
+    });
 }
 
 function deleteListComplet() {
@@ -115,8 +128,8 @@ function deleteListComplet() {
 }
 
 window.onload = () => {
-  tentandoFazerAParada();
-  addLocalStorage();
-  calcPrice();
-  deleteListComplet();
+    deleteListComplet();
+    tentandoFazerAParada();
+    calcPrice();
+    addLocalStorage();
 };
